@@ -91,7 +91,7 @@ pytest ./tests/test_airports.py
 
     test_delete_favorite: Sends a DELETE request to remove a favorite airport and asserts the response.
 
-For more details, check my article [here](https://)
+For more details, check my article [here]([https://](https://medium.com/@lutchenkovalentin/automated-api-testing-using-pytest-library-or-playwright-part-1-1b913c2ef517))
 
 
 About the API:
