@@ -24,15 +24,9 @@ deactivate
 ### Setup:
 
 ```bash
-pip install requests
+pip install -r requirements.txt.
 ```
-
-```bash
-pip install pytest
-```
-```bash
-pip install pytest-html
-```
+If you update the libraries version you can freeze update requirements
 ```bash
 pip freeze > requirements.txt
 ```
@@ -43,13 +37,13 @@ pytest test.py --html-report=./report/report.html
 ```
 OR
 ```bash
-pytest test_airports.py -s -v --html=./report/report.html
+pytest ./tests/test_airports.py -s -v --html=./report/report.html
 ```
 ### To run specific test function
 
 focused test
 ```bash
-pytest test_airports.py -s -v -k test_get_airports --html=./report/report.html
+pytest ./tests/test_airports.py -s -v -k test_get_airports --html=./report/report.html
 ```
 ### Definition of the API that will be tested
 
@@ -73,7 +67,7 @@ Running the Tests
 Run the tests using the following command:
 
 ```bash
-pytest test_airports.py
+pytest ./tests/test_airports.py
 ```
 ### Test Descriptions
 
@@ -112,5 +106,4 @@ For this tutorial, we will focus on three types of tests:
 Our Scenarios:
 
 - Positive testing of a user flow 
-- Negative scenarios to test the resilency of the API endpoints to the violations
 

@@ -12,31 +12,29 @@ password = config.get("API", "PASSWORD")
 favorites_message = config.get("API", "FAVORITES_MESSAGE")
 patched_favorites_message = config.get("API", "PATCHED_FAVORITES_MESSAGE").strip('"')
 osaka = config.get("API", "OSAKA")
+tokio = config.get("API", "TOKIO")
 ny = config.get("API", "NY")
 id = ""
+headers = {"Authorization": f"Bearer token={api_key}"}
 
 class TestClass:
     def test_get_airports(self):
-        # Send a GET request to the API endpoint
+        # Act
         response = requests.get(f"{base_url}/airports")
 
-        # Check if the response status code is 200 (OK)
+        # Assert
         assert (
             response.status_code == 200
         ), f"Expected status code 200, but got {response.status_code}"
 
-        # Parse the JSON response
         json_response = response.json()
 
-        # Check if the 'data' key is present in the response
         assert "data" in json_response, "Response does not contain 'data' key"
 
-        # Check if 'data' is a non-empty list
         assert (
             isinstance(json_response["data"], list) and len(json_response["data"]) > 0
         ), "No data in the response"
 
-        # Iterate through each airport in the response and make assertions
         for airport in json_response["data"]:
             assert "id" in airport, "Airport object does not contain 'id' key"
             assert (
@@ -63,35 +61,26 @@ class TestClass:
                 "timezone" in attributes
             ), "Airport attributes do not contain 'timezone' key"
 
-        # Check if the 'links' key is present in the response
         assert "links" in json_response, "Response does not contain 'links' key"
 
-        # Check if the 'self' link is present in the 'links' section
         assert "self" in json_response["links"], "Links do not contain 'self' key"
 
-        # Add more assertions as needed based on your specific requirements
-
     def test_get_single_airport(self):
-        # Send a GET request to the specific airport endpoint
+        # Act
         response = requests.get(f"{base_url}/airports/{osaka}")
-
-        # Check if the response status code is 200 (OK)
+        # Assert
         assert (
             response.status_code == 200
         ), f"Expected status code 200, but got {response.status_code}"
 
-        # Parse the JSON response
         json_response = response.json()
 
-        # Check if the 'data' key is present in the response
         assert "data" in json_response, "Response does not contain 'data' key"
 
-        # Check if 'data' is a dictionary
         assert isinstance(
             json_response["data"], dict
         ), "Data in the response is not a dictionary"
 
-        # Make assertions about the attributes of the specific airport
         airport_data = json_response["data"]
         assert "id" in airport_data, "Airport data does not contain 'id' key"
         assert (
@@ -108,7 +97,7 @@ class TestClass:
             "country" in attributes and attributes["country"] == "Japan"
         ), "Invalid 'country' in airport attributes"
         assert (
-            "iata" in attributes and attributes["iata"] == "KIX"
+            "iata" in attributes and attributes["iata"] == osaka
         ), "Invalid 'iata' in airport attributes"
         assert (
             "icao" in attributes and attributes["icao"] == "RJBB"
@@ -128,32 +117,26 @@ class TestClass:
         ), "Invalid 'timezone' in airport attributes"
 
     def test_post_airport_distance(self):
-        # Data for the POST request
-        payload = {"from": osaka, "to": "NRT"}
-
-        # Send a POST request to the airport distance endpoint
+        # Arrange
+        payload = {"from": osaka, "to": tokio}
+        # Act
         response = requests.post(f"{base_url}/airports/distance", data=payload)
-
-        # Check if the response status code is 200 (OK)
+        # Assert
         assert (
             response.status_code == 200
         ), f"Expected status code 200, but got {response.status_code}"
 
-        # Parse the JSON response
         json_response = response.json()
 
-        # Check if the 'data' key is present in the response
         assert "data" in json_response, "Response does not contain 'data' key"
 
-        # Check if 'data' is a dictionary
         assert isinstance(
             json_response["data"], dict
         ), "Data in the response is not a dictionary"
 
-        # Make assertions about the attributes of the airport distance
         airport_distance_data = json_response["data"]
         assert (
-            "id" in airport_distance_data and airport_distance_data["id"] == "KIX-NRT"
+            "id" in airport_distance_data and airport_distance_data["id"] == f"{osaka}-{tokio}"
         ), "Invalid 'id' in airport distance data"
         assert (
             "type" in airport_distance_data
@@ -173,7 +156,6 @@ class TestClass:
             "name" in from_airport
             and from_airport["name"] == "Kansai International Airport"
         ), "Invalid 'name' in from_airport attributes"
-        # Add more assertions as needed for other attributes
 
         to_airport = attributes.get("to_airport", {})
         assert (
@@ -196,13 +178,13 @@ class TestClass:
         ), "Invalid 'nautical_miles' in airport distance attributes"
 
     def test_get_token(self):
-        # Data for the POST request
+        # Arrange
         payload = {"email": email, "password": password}
 
-        # Send a POST request to the tokens endpoint
+        # Act
         response = requests.post(f"{base_url}/tokens", data=payload)
 
-        # Check if the response status code is 200 (OK)
+        # Assert
         assert (
             response.status_code == 200
         ), f"Expected status code 200, but got {response.status_code}"
@@ -214,45 +196,36 @@ class TestClass:
         assert "token" in json_response, "Response does not contain 'token' key"
 
     def test_get_favorites(self):
-        # Set up the request headers with the authorization token
-        headers = {"Authorization": f"Token {api_key}"}
-
-        # Send a GET request to the favorites endpoint with the authorization token
+        # Arrange
+        # Act
         response = requests.get(f"{base_url}/favorites", headers=headers)
 
-        # Check if the response status code is 200 (OK)
+        # Assert
         assert (
             response.status_code == 200
         ), f"Expected status code 200, but got {response.status_code}"
 
-        # Parse the JSON response
         json_response = response.json()
         assert "data" in json_response, "Response does not contain 'data' key"
 
-        # Assert that the 'data' key contains an empty list
         assert (
             isinstance(json_response["data"], list) and len(json_response["data"]) == 0
         ), "Expected an empty list in 'data'"
 
     def test_create_favorite(self):
-        # Set up the request headers with the authorization token
-        headers = {"Authorization": f"Bearer token={api_key}"}
-
-        # Set up the request data
+        # Arrange
         data = {"airport_id": ny, "note": favorites_message}
 
-        # Send a POST request to the favorites endpoint with the authorization token
+        # Act
         response = requests.post(f"{base_url}/favorites", data=data, headers=headers)
 
-        # Check if the response status code is 201 (Created)
+        # Assert
         assert (
             response.status_code == 201
         ), f"Expected status code 201, but got {response.status_code}"
 
-        # Parse the JSON response
         json_response = response.json()
 
-        # Add assertions based on the structure of the response
         assert "data" in json_response, "Response does not contain 'data' key"
 
         favorite_data = json_response["data"]
@@ -286,21 +259,17 @@ class TestClass:
         ), "Invalid 'country' in airport info"
 
     def test_get_favorite_by_id(self):
-        # Set up the request headers with the authorization token
-        headers = {"Authorization": f"Bearer token={api_key}"}
-
-        # Send a GET request to the specified favorites endpoint with the authorization token
+        # Arrange
+        # Act
         response = requests.get(f"{base_url}/favorites/{id}", headers=headers)
 
-        # Check if the response status code is 200 (OK)
+        # Assert
         assert (
             response.status_code == 200
         ), f"Expected status code 200, but got {response.status_code}"
 
-        # Parse the JSON response
         json_response = response.json()
 
-        # Add assertions based on the structure of the response
         assert "data" in json_response, "Response does not contain 'data' key"
 
         favorite_data = json_response["data"]
@@ -331,28 +300,23 @@ class TestClass:
         ), "Invalid 'country' in airport info"
 
     def test_patch_favorite_note(self):
-        # Set up the request headers with the authorization token
-        headers = {"Authorization": f"Bearer token={api_key}"}
-
-        # Set up the request data for the PATCH request
+        # Arrange
         data = {
             "note": "My usual layover when visiting family, although it's really far away..."
         }
 
-        # Send a PATCH request to the specified favorites endpoint with the authorization token
+        # Act
         response = requests.patch(
             f"{base_url}/favorites/{id}", data=data, headers=headers
         )
 
-        # Check if the response status code is 200 (OK)
+        # Assert
         assert (
             response.status_code == 200
         ), f"Expected status code 200, but got {response.status_code}"
 
-        # Parse the JSON response
         json_response = response.json()
 
-        # Add assertions based on the structure of the response
         assert "data" in json_response, "Response does not contain 'data' key"
 
         favorite_data = json_response["data"]
@@ -383,21 +347,17 @@ class TestClass:
         ), "Invalid 'country' in airport info"
 
     def test_get_patched_favorite_by_id(self):
-        # Set up the request headers with the authorization token
-        headers = {"Authorization": f"Bearer token={api_key}"}
-
-        # Send a GET request to the specified favorites endpoint with the authorization token
+        # Arrange
+        # Act
         response = requests.get(f"{base_url}/favorites/{id}", headers=headers)
 
-        # Check if the response status code is 200 (OK)
+        # Assert
         assert (
             response.status_code == 200
         ), f"Expected status code 200, but got {response.status_code}"
 
-        # Parse the JSON response
         json_response = response.json()
 
-        # Add assertions based on the structure of the response
         assert "data" in json_response, "Response does not contain 'data' key"
 
         favorite_data = json_response["data"]
@@ -428,18 +388,15 @@ class TestClass:
         ), "Invalid 'country' in airport info"
 
     def test_delete_favorite(self):
-        # Set up the request headers with the authorization token
-        headers = {"Authorization": f"Bearer token={api_key}"}
-
-        # Send a DELETE request to the specified favorites endpoint with the authorization token
+        # Arrange
+        # Act
         response = requests.delete(f"{base_url}/favorites/{id}", headers=headers)
 
-        # Check if the response status code is 204 (No Content)
+        # Asseert
         assert (
             response.status_code == 204
         ), f"Expected status code 204, but got {response.status_code}"
 
 
-# Run the tests using Pytest
 if __name__ == "__main__":
     pytest.main([__file__])
