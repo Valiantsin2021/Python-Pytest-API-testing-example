@@ -7,21 +7,25 @@ import os
 config = configparser.ConfigParser()
 config.read("config.ini")
 
-api_key = config.get("API", "TOKEN") or os.getenv("TOKEN")
-base_url = config.get("API", "BASE_URL") or os.getenv("BASE_URL")
-email = config.get("API", "EMAIL") or os.getenv("EMAIL")
-password = config.get("API", "PASSWORD") or os.getenv("PASSWORD")
-favorites_message = config.get("API", "FAVORITES_MESSAGE") or os.getenv("FAVORITES_MESSAGE")
-patched_favorites_message = config.get("API", "PATCHED_FAVORITES_MESSAGE").strip('"') or os.getenv("PATCHED_FAVORITES_MESSAGE")
-osaka = config.get("API", "OSAKA") or os.getenv("OSAKA")
-tokio = config.get("API", "TOKIO") or os.getenv("TOKIO")
-ny = config.get("API", "NY") or os.getenv("NY")
+api_key = os.getenv("TOKEN") or config.get("API", "TOKEN")
+base_url = os.getenv("BASE_URL") or config.get("API", "BASE_URL")
+email = os.getenv("EMAIL") or config.get("API", "EMAIL")
+password = os.getenv("PASSWORD") or config.get("API", "PASSWORD")
+favorites_message = os.getenv("FAVORITES_MESSAGE") or config.get(
+    "API", "FAVORITES_MESSAGE"
+)
+patched_favorites_message = os.getenv("PATCHED_FAVORITES_MESSAGE") or config.get(
+    "API", "PATCHED_FAVORITES_MESSAGE"
+).strip('"')
+osaka = os.getenv("OSAKA") or config.get("API", "OSAKA")
+tokio = os.getenv("TOKIO") or config.get("API", "TOKIO")
+ny = os.getenv("NY") or config.get("API", "NY")
 id = ""
 headers = {"Authorization": f"Bearer token={api_key}"}
 
+
 @allure.feature("Test example API")
 class TestClass:
-    
     @allure.story("Test GET all airports")
     @allure.title("Verify the GET airports")
     @allure.description("verify the GET API response status code and data")
@@ -72,7 +76,7 @@ class TestClass:
         assert "links" in json_response, "Response does not contain 'links' key"
 
         assert "self" in json_response["links"], "Links do not contain 'self' key"
-    
+
     @allure.story("Test GET single airport")
     @allure.title("Verify the GET single airport")
     @allure.description("verify the GET API response status code and data")
@@ -127,7 +131,7 @@ class TestClass:
         assert (
             "timezone" in attributes and attributes["timezone"] == "Asia/Tokyo"
         ), "Invalid 'timezone' in airport attributes"
-    
+
     @allure.story("Test POST airport distance")
     @allure.title("Verify the POST airport distance")
     @allure.description("verify the POST API response status code and data")
@@ -152,7 +156,8 @@ class TestClass:
 
         airport_distance_data = json_response["data"]
         assert (
-            "id" in airport_distance_data and airport_distance_data["id"] == f"{osaka}-{tokio}"
+            "id" in airport_distance_data
+            and airport_distance_data["id"] == f"{osaka}-{tokio}"
         ), "Invalid 'id' in airport distance data"
         assert (
             "type" in airport_distance_data
@@ -192,7 +197,7 @@ class TestClass:
         assert "nautical_miles" in attributes and isinstance(
             attributes["nautical_miles"], float
         ), "Invalid 'nautical_miles' in airport distance attributes"
-    
+
     @allure.story("Test GET API token")
     @allure.title("Verify the GET API token")
     @allure.description("verify the GET API response status code and data")
@@ -214,7 +219,7 @@ class TestClass:
 
         # Check if the 'token' key is present in the response
         assert "token" in json_response, "Response does not contain 'token' key"
-    
+
     @allure.story("Test GET favorites")
     @allure.title("Verify the get API")
     @allure.description("verify the GET API response status code and data")
@@ -235,7 +240,7 @@ class TestClass:
         assert (
             isinstance(json_response["data"], list) and len(json_response["data"]) == 0
         ), "Expected an empty list in 'data'"
-    
+
     @allure.story("Test POST favorite")
     @allure.title("Verify the POST favorite")
     @allure.description("verify the POST API response status code and data")
@@ -285,7 +290,7 @@ class TestClass:
         assert (
             "country" in airport_info and airport_info["country"] == "United States"
         ), "Invalid 'country' in airport info"
-    
+
     @allure.story("Test GET created favorite")
     @allure.title("Verify the GET created favorite")
     @allure.description("verify the get API response status code and data")
@@ -330,7 +335,7 @@ class TestClass:
         assert (
             "country" in airport_info and airport_info["country"] == "United States"
         ), "Invalid 'country' in airport info"
-    
+
     @allure.story("Test example PATCH favorite")
     @allure.title("Verify the PATCH favorite")
     @allure.description("verify the PATCH API response status code and data")
@@ -381,7 +386,7 @@ class TestClass:
         assert (
             "country" in airport_info and airport_info["country"] == "United States"
         ), "Invalid 'country' in airport info"
-    
+
     @allure.story("Test example GET patched favorite")
     @allure.title("Verify the GET patched favorite")
     @allure.description("verify the GET API response status code and data")
@@ -426,7 +431,7 @@ class TestClass:
         assert (
             "country" in airport_info and airport_info["country"] == "United States"
         ), "Invalid 'country' in airport info"
-    
+
     @allure.story("Test example DELETE favorite")
     @allure.title("Verify the DELETE API")
     @allure.description("verify the DELETE API response status code and data")
@@ -440,7 +445,7 @@ class TestClass:
         assert (
             response.status_code == 204
         ), f"Expected status code 204, but got {response.status_code}"
-    
+
     @allure.story("Test example GET deleted favorite")
     @allure.title("Verify the GET deleted favorite")
     @allure.description("verify the GET API response status code and data")
@@ -458,5 +463,7 @@ class TestClass:
         # json_response = response.json()
 
         # assert "data" in json_response, "Response does not contain 'data' key"
+
+
 if __name__ == "__main__":
     pytest.main([__file__])
