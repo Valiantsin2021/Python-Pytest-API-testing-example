@@ -2,20 +2,20 @@ import requests
 import configparser
 import pytest
 import allure
-
+import os
 
 config = configparser.ConfigParser()
 config.read("config.ini")
 
-api_key = config.get("API", "TOKEN")
-base_url = config.get("API", "BASE_URL")
-email = config.get("API", "EMAIL")
-password = config.get("API", "PASSWORD")
-favorites_message = config.get("API", "FAVORITES_MESSAGE")
-patched_favorites_message = config.get("API", "PATCHED_FAVORITES_MESSAGE").strip('"')
-osaka = config.get("API", "OSAKA")
-tokio = config.get("API", "TOKIO")
-ny = config.get("API", "NY")
+api_key = config.get("API", "TOKEN") or os.getenv("TOKEN")
+base_url = config.get("API", "BASE_URL") or os.getenv("BASE_URL")
+email = config.get("API", "EMAIL") or os.getenv("EMAIL")
+password = config.get("API", "PASSWORD") or os.getenv("PASSWORD")
+favorites_message = config.get("API", "FAVORITES_MESSAGE") or os.getenv("FAVORITES_MESSAGE")
+patched_favorites_message = config.get("API", "PATCHED_FAVORITES_MESSAGE").strip('"') or os.getenv("PATCHED_FAVORITES_MESSAGE")
+osaka = config.get("API", "OSAKA") or os.getenv("OSAKA")
+tokio = config.get("API", "TOKIO") or os.getenv("TOKIO")
+ny = config.get("API", "NY") or os.getenv("NY")
 id = ""
 headers = {"Authorization": f"Bearer token={api_key}"}
 
