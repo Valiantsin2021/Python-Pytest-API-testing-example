@@ -21,7 +21,6 @@ prompt-toolkit==3.0.41
 pure-eval==0.2.2
 Pygments==2.17.2
 pytest==7.4.3
-pytest-html==4.1.1
 pytest-metadata==3.0.0
 python-dateutil==2.8.2
 requests==2.26.0
@@ -32,3 +31,5 @@ traitlets==5.14.0
 types-requests
 urllib3
 wcwidth==0.2.12
+pytest-html-reporter
+allure-pytest

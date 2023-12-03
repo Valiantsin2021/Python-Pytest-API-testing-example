@@ -1,6 +1,8 @@
 import requests
 import configparser
 import pytest
+import allure
+
 
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -17,7 +19,13 @@ ny = config.get("API", "NY")
 id = ""
 headers = {"Authorization": f"Bearer token={api_key}"}
 
+@allure.feature("Test example API")
 class TestClass:
+    
+    @allure.story("Test GET all airports")
+    @allure.title("Verify the GET airports")
+    @allure.description("verify the GET API response status code and data")
+    @allure.severity("blocker")
     def test_get_airports(self):
         # Act
         response = requests.get(f"{base_url}/airports")
@@ -64,7 +72,11 @@ class TestClass:
         assert "links" in json_response, "Response does not contain 'links' key"
 
         assert "self" in json_response["links"], "Links do not contain 'self' key"
-
+    
+    @allure.story("Test GET single airport")
+    @allure.title("Verify the GET single airport")
+    @allure.description("verify the GET API response status code and data")
+    @allure.severity("blocker")
     def test_get_single_airport(self):
         # Act
         response = requests.get(f"{base_url}/airports/{osaka}")
@@ -115,7 +127,11 @@ class TestClass:
         assert (
             "timezone" in attributes and attributes["timezone"] == "Asia/Tokyo"
         ), "Invalid 'timezone' in airport attributes"
-
+    
+    @allure.story("Test POST airport distance")
+    @allure.title("Verify the POST airport distance")
+    @allure.description("verify the POST API response status code and data")
+    @allure.severity("blocker")
     def test_post_airport_distance(self):
         # Arrange
         payload = {"from": osaka, "to": tokio}
@@ -176,7 +192,11 @@ class TestClass:
         assert "nautical_miles" in attributes and isinstance(
             attributes["nautical_miles"], float
         ), "Invalid 'nautical_miles' in airport distance attributes"
-
+    
+    @allure.story("Test GET API token")
+    @allure.title("Verify the GET API token")
+    @allure.description("verify the GET API response status code and data")
+    @allure.severity("blocker")
     def test_get_token(self):
         # Arrange
         payload = {"email": email, "password": password}
@@ -194,7 +214,11 @@ class TestClass:
 
         # Check if the 'token' key is present in the response
         assert "token" in json_response, "Response does not contain 'token' key"
-
+    
+    @allure.story("Test GET favorites")
+    @allure.title("Verify the get API")
+    @allure.description("verify the GET API response status code and data")
+    @allure.severity("blocker")
     def test_get_favorites(self):
         # Arrange
         # Act
@@ -211,7 +235,11 @@ class TestClass:
         assert (
             isinstance(json_response["data"], list) and len(json_response["data"]) == 0
         ), "Expected an empty list in 'data'"
-
+    
+    @allure.story("Test POST favorite")
+    @allure.title("Verify the POST favorite")
+    @allure.description("verify the POST API response status code and data")
+    @allure.severity("blocker")
     def test_create_favorite(self):
         # Arrange
         data = {"airport_id": ny, "note": favorites_message}
@@ -257,7 +285,11 @@ class TestClass:
         assert (
             "country" in airport_info and airport_info["country"] == "United States"
         ), "Invalid 'country' in airport info"
-
+    
+    @allure.story("Test GET created favorite")
+    @allure.title("Verify the GET created favorite")
+    @allure.description("verify the get API response status code and data")
+    @allure.severity("blocker")
     def test_get_favorite_by_id(self):
         # Arrange
         # Act
@@ -298,7 +330,11 @@ class TestClass:
         assert (
             "country" in airport_info and airport_info["country"] == "United States"
         ), "Invalid 'country' in airport info"
-
+    
+    @allure.story("Test example PATCH favorite")
+    @allure.title("Verify the PATCH favorite")
+    @allure.description("verify the PATCH API response status code and data")
+    @allure.severity("blocker")
     def test_patch_favorite_note(self):
         # Arrange
         data = {
@@ -345,12 +381,16 @@ class TestClass:
         assert (
             "country" in airport_info and airport_info["country"] == "United States"
         ), "Invalid 'country' in airport info"
-
+    
+    @allure.story("Test example GET patched favorite")
+    @allure.title("Verify the GET patched favorite")
+    @allure.description("verify the GET API response status code and data")
+    @allure.severity("blocker")
     def test_get_patched_favorite_by_id(self):
         # Arrange
         # Act
         response = requests.get(f"{base_url}/favorites/{id}", headers=headers)
-
+        print(id)
         # Assert
         assert (
             response.status_code == 200
@@ -386,7 +426,11 @@ class TestClass:
         assert (
             "country" in airport_info and airport_info["country"] == "United States"
         ), "Invalid 'country' in airport info"
-
+    
+    @allure.story("Test example DELETE favorite")
+    @allure.title("Verify the DELETE API")
+    @allure.description("verify the DELETE API response status code and data")
+    @allure.severity("blocker")
     def test_delete_favorite(self):
         # Arrange
         # Act
@@ -396,7 +440,23 @@ class TestClass:
         assert (
             response.status_code == 204
         ), f"Expected status code 204, but got {response.status_code}"
+    
+    @allure.story("Test example GET deleted favorite")
+    @allure.title("Verify the GET deleted favorite")
+    @allure.description("verify the GET API response status code and data")
+    @allure.severity("blocker")
+    def test_get_deleted_favorite_by_id(self):
+        # Arrange
+        # Act
+        response = requests.get(f"{base_url}/favorites/{id}", headers=headers)
 
+        # Assert
+        assert (
+            response.status_code == 404
+        ), f"Expected status code 404, but got {response.status_code}"
 
+        # json_response = response.json()
+
+        # assert "data" in json_response, "Response does not contain 'data' key"
 if __name__ == "__main__":
     pytest.main([__file__])
